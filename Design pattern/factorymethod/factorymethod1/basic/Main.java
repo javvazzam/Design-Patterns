@@ -1,29 +1,91 @@
 package factorymethod.factorymethod1.basic;
+
+class Ship {
+    private String model;
+    private int year;
+    private int maxSpeed;
+
+    public Ship(String model, int year, int maxSpeed) {
+        this.model = model;
+        this.year = year;
+        this.maxSpeed = maxSpeed;
+    }
+
+    public String getModel() {
+        return this.model;
+    }
+
+    public int getYear() {
+        return this.year;
+    }
+
+    public int getMaxSpeed() {
+        return this.maxSpeed;
+    }
+
+    public void transport() {
+        System.out.println("The ship " + getModel() + " is transporting. ");
+    }
+
+    public void deliver() {
+        System.out.println("The ship " + getModel() + " is delivering. ");
+    }
+
+    @Override
+    public String toString() {
+        return "Max Speed of the ship " + getModel() + " is " + getMaxSpeed();
+    }
+}
+class Truck {
+    private String model;
+    private int year;
+    private int maxSpeed;
+
+    public Truck(String model, int year, int maxSpeed) {
+        this.model = model;
+        this.year = year;
+        this.maxSpeed = maxSpeed;
+    }
+
+    public String getModel() {
+        return this.model;
+    }
+
+    public int getYear() {
+        return this.year;
+    }
+
+    public int getMaxSpeed() {
+        return this.maxSpeed;
+    }
+
+    public void transport() {
+        System.out.println("The truck " + getModel() + " is transporting. ");
+    }
+
+    public void deliver() {
+        System.out.println("The truck " + getModel() + " is delivering. ");
+    }
+
+    @Override
+    public String toString() {
+        return "Max Speed of the truck " + getModel() + " is " + getMaxSpeed();
+    }
+}
+
 public class Main {
     public static void main(String[] args) {
         
-        Car myCar = new Car("Toyota", "Corolla", 2022, "Red", 180, 4);
-        System.out.println(myCar);
-        myCar.accelerate();
-        myCar.brake();
-        myCar.drive();
-        System.out.println(myCar);
+        Ship ship = new Ship("Hanse", 2022, 80);
+        System.out.println(ship);
 
-        // Initialize a Truck
-        Truck myTruck = new Truck("Volvo", "FH16", 2021, "White", 120, 20000);
-        System.out.println(myTruck);
-        myTruck.accelerate();
-        myTruck.brake();
-        myTruck.transport();
-        System.out.println(myTruck);
+        Truck truck = new Truck("Volvo", 2021, 200);
+        System.out.println(truck);
 
-        // Initialize a Ship
-        Ship myShip = new Ship("Maersk", "Triple E", 2019, "Blue", 40, 20);
-        System.out.println(myShip);
-        myShip.accelerate();
-        myShip.brake();
-        myShip.sail();
-        System.out.println(myShip);
+        ship.transport();
+        ship.deliver();
 
+        truck.transport();
+        truck.deliver();
     }
 }
