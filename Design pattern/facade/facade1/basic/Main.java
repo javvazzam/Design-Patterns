@@ -91,4 +91,6 @@ class Fight {
     }
 }
 
-//I wanto to create a random fights between a player and an enemy that could be random, with the enemy having higher power than the player, but all params are random in a concrete range
+//I wanto to create a random fights using a common interface to create and start them
+//I want to create random fights, simplifying the interaction in the code where the fights start and the components that take care of the details of the fights
+//I want to create randomfights refactoring the coded by just using one common interface
