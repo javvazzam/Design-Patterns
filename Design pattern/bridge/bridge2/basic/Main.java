@@ -69,3 +69,4 @@ public class Main {
     }
 }
 
+//I want to add a color to the shapes, but I need to have this functionality aside from implementation of the shapes
