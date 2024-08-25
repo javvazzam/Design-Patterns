@@ -1,14 +1,16 @@
-package visitor.visitor2.basic;
+package visitor.visitor2.chatgpt.run2;
 
 import java.util.ArrayList;
 import java.util.List;
 
+// Shape Interface
 interface Shape {
     void move(int x, int y);
-
     void draw();
+    double accept(ShapeVisitor visitor);
 }
 
+// Dot Class
 class Dot implements Shape {
     private int x, y;
     private int id;
@@ -31,6 +33,11 @@ class Dot implements Shape {
         System.out.println("Drawing a dot at (" + x + ", " + y + ")");
     }
 
+    @Override
+    public double accept(ShapeVisitor visitor) {
+        return visitor.visit(this);
+    }
+
     public int getId() {
         return id;
     }
@@ -44,6 +51,7 @@ class Dot implements Shape {
     }
 }
 
+// Circle Class
 class Circle implements Shape {
     private int x, y, radius;
     private int id;
@@ -67,6 +75,11 @@ class Circle implements Shape {
         System.out.println("Drawing a circle at (" + x + ", " + y + ") with radius " + radius);
     }
 
+    @Override
+    public double accept(ShapeVisitor visitor) {
+        return visitor.visit(this);
+    }
+
     public int getId() {
         return id;
     }
@@ -84,6 +97,7 @@ class Circle implements Shape {
     }
 }
 
+// Rectangle Class
 class Rectangle implements Shape {
     private int x, y, width, height;
     private int id;
@@ -105,8 +119,12 @@ class Rectangle implements Shape {
 
     @Override
     public void draw() {
-        System.out
-                .println("Drawing a rectangle at (" + x + ", " + y + ") with width " + width + " and height " + height);
+        System.out.println("Drawing a rectangle at (" + x + ", " + y + ") with width " + width + " and height " + height);
+    }
+
+    @Override
+    public double accept(ShapeVisitor visitor) {
+        return visitor.visit(this);
     }
 
     public int getId() {
@@ -130,6 +148,7 @@ class Rectangle implements Shape {
     }
 }
 
+// CompoundShape Class
 class CompoundShape implements Shape {
     private List<Shape> children = new ArrayList<>();
     private int id;
@@ -154,6 +173,11 @@ class CompoundShape implements Shape {
         System.out.println("Drawing CompoundShape with ID " + id);
     }
 
+    @Override
+    public double accept(ShapeVisitor visitor) {
+        return visitor.visit(this);
+    }
+
     public void add(Shape shape) {
         children.add(shape);
     }
@@ -167,6 +191,44 @@ class CompoundShape implements Shape {
     }
 }
 
+// ShapeVisitor Interface
+interface ShapeVisitor {
+    double visit(Dot dot);
+    double visit(Circle circle);
+    double visit(Rectangle rectangle);
+    double visit(CompoundShape compoundShape);
+}
+
+// AreaCalculator Class
+class AreaCalculator implements ShapeVisitor {
+
+    @Override
+    public double visit(Dot dot) {
+        // A dot doesn't really have an area, so return 0.
+        return 0;
+    }
+
+    @Override
+    public double visit(Circle circle) {
+        return Math.PI * circle.getRadius() * circle.getRadius();
+    }
+
+    @Override
+    public double visit(Rectangle rectangle) {
+        return rectangle.getWidth() * rectangle.getHeight();
+    }
+
+    @Override
+    public double visit(CompoundShape compoundShape) {
+        double totalArea = 0;
+        for (Shape shape : compoundShape.getChildren()) {
+            totalArea += shape.accept(this);
+        }
+        return totalArea;
+    }
+}
+
+// Main Class to Execute the Program
 public class Main {
     public static void main(String[] args) {
         List<Shape> shapes = new ArrayList<>();
@@ -178,7 +240,13 @@ public class Main {
         compound.add(new Dot(15, 25, 5));
         compound.add(new Circle(35, 45, 55, 6));
         shapes.add(compound);
+
+        AreaCalculator areaCalculator = new AreaCalculator();
+
+        for (Shape shape : shapes) {
+            double area = shape.accept(areaCalculator);
+            System.out.println("Area: " + area);
+        }
     }
 }
 
-// I want to calculate the area of each shape without modifying the implementation of them, in case the structure of the shapes change.
