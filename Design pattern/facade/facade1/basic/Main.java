@@ -1,18 +1,48 @@
 package facade.facade1.basic;
 
 import java.util.Random;
+import java.util.ArrayList;
+import java.util.List;
+
+class Weapon {
+    private int baseDamage;
+    private Random random;
+
+    public Weapon(int baseDamage) {
+        this.baseDamage = baseDamage;
+        this.random = new Random();
+    }
+
+    public int attackDamage() {
+        return baseDamage + random.nextInt(baseDamage / 2);
+    }
+
+    public int getBaseDamage() {
+        return baseDamage;
+    }
+}
+
+class Armor {
+    private int defense;
+
+    public Armor(int defense) {
+        this.defense = defense;
+    }
+
+    public int getDefense() {
+        return defense;
+    }
+}
 
 class Player {
     private int life;
-    private int armor;
-    private int weaponDamage;
-    private Random random;
+    private Armor armor;
+    private Weapon weapon;
 
-    public Player(int life, int armor, int weaponDamage) {
+    public Player(int life, Armor armor, Weapon weapon) {
         this.life = life;
         this.armor = armor;
-        this.weaponDamage = weaponDamage;
-        this.random = new Random();
+        this.weapon = weapon;
     }
 
     public int getLife() {
@@ -20,15 +50,13 @@ class Player {
     }
 
     public void takeDamage(int damage) {
-        int damageTaken = damage - armor;
-        if (damageTaken > 0) {
-            life -= damageTaken;
-        }
+        int damageTaken = Math.max(damage - armor.getDefense(), 0);
+        life -= damageTaken;
         System.out.println("Player takes " + damageTaken + " damage, life is now " + life);
     }
 
     public int attack() {
-        int damage = weaponDamage + random.nextInt(weaponDamage / 2); // Daño aleatorio
+        int damage = weapon.attackDamage();
         System.out.println("Player attacks with damage " + damage);
         return damage;
     }
@@ -59,7 +87,7 @@ class Enemy {
     }
 
     public int attack() {
-        int damage = magicDamage + random.nextInt(magicDamage / 2); // Daño aleatorio
+        int damage = magicDamage + random.nextInt(magicDamage / 2); // Daño mágico aleatorio
         System.out.println("Enemy attacks with magic damage " + damage);
         return damage;
     }
@@ -69,28 +97,46 @@ class Enemy {
     }
 }
 
-class Fight {
-    public void startFight(Player player, Enemy enemy) {
-        System.out.println("The fight begins!");
+class BattleStatistics {
+    private int totalPlayerDamage;
+    private int totalEnemyDamage;
 
-        while (player.isAlive() && enemy.isAlive()) {
-            // Player attacks first
-            enemy.takeDamage(player.attack());
+    public BattleStatistics() {
+        this.totalPlayerDamage = 0;
+        this.totalEnemyDamage = 0;
+    }
 
-            if (enemy.isAlive()) {
-                // Enemy counterattacks
-                player.takeDamage(enemy.attack());
-            }
-        }
+    public void recordPlayerDamage(int damage) {
+        totalPlayerDamage += damage;
+    }
 
-        if (player.isAlive()) {
-            System.out.println("Player wins!");
-        } else {
-            System.out.println("Enemy wins!");
+    public void recordEnemyDamage(int damage) {
+        totalEnemyDamage += damage;
+    }
+
+    public void printStatistics() {
+        System.out.println("Total Player Damage Dealt: " + totalPlayerDamage);
+        System.out.println("Total Enemy Damage Dealt: " + totalEnemyDamage);
+    }
+}
+
+class BattleLog {
+    private List<String> log;
+
+    public BattleLog() {
+        log = new ArrayList<>();
+    }
+
+    public void addEntry(String entry) {
+        log.add(entry);
+    }
+
+    public void printLog() {
+        System.out.println("Battle Log:");
+        for (String entry : log) {
+            System.out.println(entry);
         }
     }
 }
 
-//I wanto to create a random fights using a common interface to create and start them
-//I want to create random fights, simplifying the interaction in the code where the fights start and the components that take care of the details of the fights
-//I want to create randomfights refactoring the coded by just using one common interface
+//I want to simplify the interface in order to create fights

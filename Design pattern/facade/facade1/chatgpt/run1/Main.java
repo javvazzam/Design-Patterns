@@ -1,56 +1,76 @@
 package facade.facade1.chatgpt.run1;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
-interface Fighter {
-    int attack();
-    void takeDamage(int damage);
-    boolean isAlive();
-    int getLife();
-}
-
-
-class Player implements Fighter {
-    private int life;
-    private int armor;
-    private int weaponDamage;
+// Weapon class
+class Weapon {
+    private int baseDamage;
     private Random random;
 
-    public Player(int life, int armor, int weaponDamage) {
-        this.life = life;
-        this.armor = armor;
-        this.weaponDamage = weaponDamage;
+    public Weapon(int baseDamage) {
+        this.baseDamage = baseDamage;
         this.random = new Random();
     }
 
-    @Override
+    public int attackDamage() {
+        return baseDamage + random.nextInt(baseDamage / 2);
+    }
+
+    public int getBaseDamage() {
+        return baseDamage;
+    }
+}
+
+// Armor class
+class Armor {
+    private int defense;
+
+    public Armor(int defense) {
+        this.defense = defense;
+    }
+
+    public int getDefense() {
+        return defense;
+    }
+}
+
+// Player class
+class Player implements Character {
+    private int life;
+    private Armor armor;
+    private Weapon weapon;
+
+    public Player(int life, Armor armor, Weapon weapon) {
+        this.life = life;
+        this.armor = armor;
+        this.weapon = weapon;
+    }
+
     public int getLife() {
         return life;
     }
 
-    @Override
     public void takeDamage(int damage) {
-        int damageTaken = damage - armor;
-        if (damageTaken > 0) {
-            life -= damageTaken;
-        }
+        int damageTaken = Math.max(damage - armor.getDefense(), 0);
+        life -= damageTaken;
         System.out.println("Player takes " + damageTaken + " damage, life is now " + life);
     }
 
-    @Override
     public int attack() {
-        int damage = weaponDamage + random.nextInt(weaponDamage / 2); // Random damage
+        int damage = weapon.attackDamage();
         System.out.println("Player attacks with damage " + damage);
         return damage;
     }
 
-    @Override
     public boolean isAlive() {
         return life > 0;
     }
 }
 
-class Enemy implements Fighter {
+// Enemy class
+class Enemy implements Character {
     private int life;
     private int magicDamage;
     private Random random;
@@ -61,60 +81,143 @@ class Enemy implements Fighter {
         this.random = new Random();
     }
 
-    @Override
     public int getLife() {
         return life;
     }
 
-    @Override
     public void takeDamage(int damage) {
         life -= damage;
         System.out.println("Enemy takes " + damage + " damage, life is now " + life);
     }
 
-    @Override
     public int attack() {
-        int damage = magicDamage + random.nextInt(magicDamage / 2); // Random damage
+        int damage = magicDamage + random.nextInt(magicDamage / 2);
         System.out.println("Enemy attacks with magic damage " + damage);
         return damage;
     }
 
-    @Override
     public boolean isAlive() {
         return life > 0;
     }
 }
 
+// BattleStatistics class
+class BattleStatistics {
+    private int totalPlayerDamage;
+    private int totalEnemyDamage;
 
-class Fight {
-    public void startFight(Fighter fighter1, Fighter fighter2) {
-        System.out.println("The fight begins!");
+    public BattleStatistics() {
+        this.totalPlayerDamage = 0;
+        this.totalEnemyDamage = 0;
+    }
 
-        while (fighter1.isAlive() && fighter2.isAlive()) {
-            // Fighter 1 attacks first
-            fighter2.takeDamage(fighter1.attack());
+    public void recordPlayerDamage(int damage) {
+        totalPlayerDamage += damage;
+    }
 
-            if (fighter2.isAlive()) {
-                // Fighter 2 counterattacks
-                fighter1.takeDamage(fighter2.attack());
+    public void recordEnemyDamage(int damage) {
+        totalEnemyDamage += damage;
+    }
+
+    public void printStatistics() {
+        System.out.println("Total Player Damage Dealt: " + totalPlayerDamage);
+        System.out.println("Total Enemy Damage Dealt: " + totalEnemyDamage);
+    }
+}
+
+// BattleLog class
+class BattleLog {
+    private List<String> log;
+
+    public BattleLog() {
+        log = new ArrayList<>();
+    }
+
+    public void addEntry(String entry) {
+        log.add(entry);
+    }
+
+    public void printLog() {
+        System.out.println("Battle Log:");
+        for (String entry : log) {
+            System.out.println(entry);
+        }
+    }
+}
+
+// Battle class
+class Battle {
+    private Player player;
+    private Enemy enemy;
+    private BattleStatistics statistics;
+    private BattleLog log;
+
+    public Battle(Player player, Enemy enemy) {
+        this.player = player;
+        this.enemy = enemy;
+        this.statistics = new BattleStatistics();
+        this.log = new BattleLog();
+    }
+
+    public void start() {
+        while (player.isAlive() && enemy.isAlive()) {
+            // Player attacks enemy
+            performAttack(player, enemy);
+            
+            // Check if enemy is defeated
+            if (!enemy.isAlive()) {
+                log.addEntry("Enemy defeated!");
+                break;
+            }
+            
+            // Enemy attacks player
+            performAttack(enemy, player);
+            
+            // Check if player is defeated
+            if (!player.isAlive()) {
+                log.addEntry("Player defeated!");
+                break;
             }
         }
 
-        if (fighter1.isAlive()) {
-            System.out.println("Fighter 1 wins!");
+        // Print final statistics and log
+        statistics.printStatistics();
+        log.printLog();
+    }
+
+    private void performAttack(Character attacker, Character defender) {
+        int damage = attacker.attack();
+        defender.takeDamage(damage);
+        if (attacker instanceof Player) {
+            statistics.recordPlayerDamage(damage);
+            log.addEntry("Player dealt " + damage + " damage to Enemy");
         } else {
-            System.out.println("Fighter 2 wins!");
+            statistics.recordEnemyDamage(damage);
+            log.addEntry("Enemy dealt " + damage + " damage to Player");
         }
     }
 }
 
-public class Main {
-    public static void main(String[] args) {
-        Player player = new Player(100, 10, 20);
-        Enemy enemy = new Enemy(80, 15);
-
-        Fight fight = new Fight();
-        fight.startFight(player, enemy);  // Player vs Enemy
-    }
+// Character interface
+interface Character {
+    int attack();
+    void takeDamage(int damage);
+    boolean isAlive();
 }
 
+// Main class to run the battle
+public class Main {
+    public static void main(String[] args) {
+        // Create a player with life, armor, and weapon
+        Weapon playerWeapon = new Weapon(20);
+        Armor playerArmor = new Armor(5);
+        Player player = new Player(100, playerArmor, playerWeapon);
+
+        // Create an enemy with life and magic damage
+        Enemy enemy = new Enemy(50, 15);
+
+        // Create and start a battle
+        Battle battle = new Battle(player, enemy);
+        battle.start();
+    }
+}

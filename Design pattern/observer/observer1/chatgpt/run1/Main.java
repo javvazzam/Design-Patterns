@@ -3,18 +3,15 @@ package observer.observer1.chatgpt.run1;
 import java.util.ArrayList;
 import java.util.List;
 
-// Enum representing different news topics
 enum Topic {
     TECHNOLOGIES, SPORTS, POLITICS
 }
 
-// Observer interface that defines the update method
-interface Observer {
+interface Base {
     void update(News news);
 }
 
-// User class that implements the Observer interface
-class User implements Observer {
+class User implements Base {
     private String name;
     private Topic interest;
 
@@ -39,7 +36,6 @@ class User implements Observer {
     }
 }
 
-// News class representing a news item
 class News {
     private String title;
     private String description;
@@ -64,31 +60,30 @@ class News {
     }
 }
 
-// NewsChannel class that manages observers and publishes news
 class NewsChannel {
     private News latestNews;
-    private List<Observer> observers;
+    private List<Base> bases;
 
     public NewsChannel() {
-        this.observers = new ArrayList<>();
+        this.bases = new ArrayList<>();
     }
 
-    public void subscribe(Observer observer) {
-        this.observers.add(observer);
+    public void subscribe(Base base) {
+        this.bases.add(base);
     }
 
-    public void unsubscribe(Observer observer) {
-        this.observers.remove(observer);
+    public void unsubscribe(Base base) {
+        this.bases.remove(base);
     }
 
     public void publishNews(News news) {
         this.latestNews = news;
-        notifyAllObservers();
+        notifyAllBases();
     }
 
-    private void notifyAllObservers() {
-        for (Observer observer : observers) {
-            observer.update(latestNews);
+    private void notifyAllBases() {
+        for (Base base : bases) {
+            base.update(latestNews);
         }
     }
 }
